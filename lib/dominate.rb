@@ -18,6 +18,7 @@ module Dominate
     end
 
     def scope name
+      reset_html
       Scope.new doc.search "[data-scope='#{name}']", instance
     end
 
@@ -29,7 +30,14 @@ module Dominate
     end
 
     def apply_instance
+      reset_html
       Scope.new(doc, instance).apply_instance
+    end
+
+    private
+
+    def reset_html
+      @html = false
     end
   end
 
