@@ -22,9 +22,10 @@ module Dominate
     end
 
     def html
-      apply_instance if instance
-
-      @html ||= "#{doc}"
+      @html ||= begin
+        apply_instance if instance
+        "#{doc}"
+      end
     end
 
     def apply_instance
