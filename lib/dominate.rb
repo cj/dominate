@@ -19,7 +19,7 @@ module Dominate
 
     def scope name
       reset_html
-      Scope.new doc.search "[data-scope='#{name}']", instance
+      Scope.new instance, doc.search("[data-scope='#{name}']")
     end
 
     def html
@@ -31,7 +31,7 @@ module Dominate
 
     def apply_instance
       reset_html
-      Scope.new(doc, instance).apply_instance
+      Scope.new(instance, doc).apply_instance
     end
 
     private
@@ -41,9 +41,9 @@ module Dominate
     end
   end
 
-  class Scope < Struct.new :root_doc, :instance
+  class Scope < Struct.new :instance, :root_doc
 
-    def apply data
+    def apply data, &block
       @data = data
 
       root_doc.each do |doc|
@@ -52,7 +52,11 @@ module Dominate
         else
           doc = apply_data doc, data
         end
+
+        block.call doc if block
       end
+
+      root_doc
     end
 
     def apply_instance
@@ -90,8 +94,6 @@ module Dominate
       doc.children.each_with_index do |node, index|
         if "#{node}"['data-scope']
           placement = (index == 0 ? 'after' : 'before')
-          # TODO: Scope.new doc.search "[data-scope='#{name}']"
-          # create a new scope
         else
           node.remove
         end
@@ -105,7 +107,17 @@ module Dominate
         # lets look for data-prop elements
         elem.traverse do |x|
           if x.attributes.keys.include? 'data-prop'
-            x.inner_html = data[x.attr('data-prop').to_s.to_sym]
+            value = data[x.attr('data-prop').to_s.to_sym]
+
+            if value.is_a? Proc
+              x.inner_html = if value.parameters.length > 0
+                instance.instance_exec(data, &value).to_s
+              else
+                instance.instance_exec(&value).to_s
+              end
+            else
+              x.inner_html = value.to_s
+            end
           end
         end
 
