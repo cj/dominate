@@ -3,19 +3,54 @@ require "dominate/version"
 require "dominate/inflectors"
 
 module Dominate
-  class << self
-    def HTML html, data = {}
-      Dom.new html, data
-    end
+  extend self
+
+  attr_accessor :config, :reset_config, :load_all
+
+  def HTML html, data = {}
+    Dom.new html, data
+  end
+
+  def setup
+    yield config
+  end
+
+  def config
+    @config || reset_config!
+  end
+
+  # Resets the configuration to the default (empty hash)
+  def reset_config!
+    @config = OpenStruct.new
   end
 
   class Dom
     attr_accessor :raw_html, :instance, :doc
 
+    PARTIAL_REGEX = /<!--\s*@partial\s*([a-zA-Z0-9\-_]*)\s*-->/
+
     def initialize raw_html, instance = false
       @raw_html = raw_html
       @instance = instance
-      @doc      = Nokogiri::HTML raw_html
+
+      if raw_html.match(/<html.*>/)
+        @doc = Nokogiri::HTML::Document.parse raw_html
+      else
+        @doc = Nokogiri::HTML.fragment raw_html
+      end
+
+      load_partials if Dominate.config.view_path
+    end
+
+    def load_partials
+      doc.traverse do |e|
+        if match = e.to_html.strip.match(PARTIAL_REGEX)
+          partial = match[1]
+          e.swap Nokogiri::HTML.fragment(
+            File.read "#{view_path}/#{partial}.html"
+          )
+        end
+      end
     end
 
     def scope name
@@ -39,6 +74,10 @@ module Dominate
 
     def reset_html
       @html = false
+    end
+
+    def view_path
+      Dominate.config.view_path
     end
   end
 

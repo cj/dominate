@@ -1,6 +1,11 @@
 require_relative 'helper'
 require 'dominate'
 setup do
+  Dominate.reset_config!
+  Dominate.setup do |c|
+    c.view_path = './test/dummy'
+  end
+
   inline_html = File.read './test/dummy/index.html'
 
   instance = OpenStruct.new({
@@ -17,12 +22,12 @@ setup do
 end
 
 scope 'dominate' do
-  test 'render html' do |a|
+  test 'html' do |a|
     assert a.dom.html['test']
     assert a.dom.html.scan(/<a.*>/).length == 2
   end
 
-  test 'binding data' do |a|
+  test 'data' do |a|
     a.dom.scope(:list).apply([
       { todo: 'get milk' },
       { todo: 'get cookies' },
@@ -35,7 +40,7 @@ scope 'dominate' do
     assert a.dom.html['get cookies']
   end
 
-  test 'binding context' do |a|
+  test 'context' do |a|
     assert a.dom.html['John'] == nil
     assert a.dom.html['CJ']
   end
