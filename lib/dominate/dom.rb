@@ -39,7 +39,7 @@ module Dominate
 
     def load_layout
       html       = load_view config.layout
-      inner_html = doc.children.first.inner_html
+      inner_html = doc.inner_html
       set_doc html.gsub YIELD_REGEX, inner_html
     end
 
@@ -67,7 +67,7 @@ module Dominate
         @doc = Nokogiri::HTML::Document.parse html
       else
         # need to wrap it in a div to make sure it has a root
-        @doc = Nokogiri::HTML.fragment "<div>#{html}</div>"
+        @doc = Nokogiri::HTML.fragment html
       end
     end
 

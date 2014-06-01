@@ -83,7 +83,9 @@ scope 'dominate' do
   end
 
   test 'layout' do |a|
+    assert a.dom.html['<head>'] == nil
     assert a.dom.html['body']
     assert a.dom.html['app layout']
+    assert a.dom.html.scan(/body/).length == 2
   end
 end

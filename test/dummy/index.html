@@ -1,26 +1,32 @@
-<!-- @partial header -->
-  <span>This should not show</span>
-<!-- /partial header -->
+<html>
+  <head>
+  </head>
+<body>
+  <!-- @partial header -->
+    <span>This should not show</span>
+  <!-- /partial header -->
 
-<div>
-  <h1 data-scope='admin_only'>Admin</h1>
-  <span>current_user:
-    <span data-instance="current_user.first_name">John</span>
-    <span data-instance="current_user.last_name">Doe</span>
-  </span>
-</div>
-<ul data-scope="list">
-  <li>
-    <a href="#" data-prop="todo">test</a>
-  </li>
-  <li>
-    <a href="#" data-prop="todo">testing</a>
-  </li>
-  <li>
-    <ul data-scope="list-nested">
-      <li data-prop="todo"></li>
-    </ul>
-  </li>
-</ul>
+  <div>
+    <h1 data-scope='admin_only'>Admin</h1>
+    <span>current_user:
+      <span data-instance="current_user.first_name">John</span>
+      <span data-instance="current_user.last_name">Doe</span>
+    </span>
+  </div>
+  <ul data-scope="list">
+    <li>
+      <a href="#" data-prop="todo">test</a>
+    </li>
+    <li>
+      <a href="#" data-prop="todo">testing</a>
+    </li>
+    <li>
+      <ul data-scope="list-nested">
+        <li data-prop="todo"></li>
+      </ul>
+    </li>
+  </ul>
 
-<!-- @partial footer -->
+  <!-- @partial footer -->
+</body>
+</html>
