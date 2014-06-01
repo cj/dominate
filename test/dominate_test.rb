@@ -1,31 +1,8 @@
 require_relative 'helper'
 require 'dominate'
-
 setup do
-  inline_html = <<-D
-    <div>
-      <div>
-        <h1 data-scope='admin_only'>Admin</h1>
-        <span>current_user:
-          <span data-instance="current_user.first_name">John</span>
-          <span data-instance="current_user.last_name">Doe</span>
-        </span>
-      </div>
-      <ul data-scope="list">
-        <li>
-          <a href="#" data-prop="todo">test</a>
-        </li>
-        <li>
-          <a href="#" data-prop="todo">testing</a>
-        </li>
-        <li>
-          <ul data-scope="list-nested">
-            <li data-prop="todo"></li>
-          </ul>
-        </li>
-      </ul>
-    </div>
-  D
+  inline_html = File.read './test/dummy/index.html'
+
   instance = OpenStruct.new({
     current_user: OpenStruct.new({
       first_name: 'CJ',
@@ -83,5 +60,16 @@ scope 'dominate' do
 
     a.dom.scope(:list).apply(data)
     assert a.dom.html['do normal person stuff']
+  end
+
+  test 'partial' do |a|
+    data = {
+      company: {
+        name: 'Test Company'
+      }
+    }
+
+    a.dom.scope(:footer).apply data
+    assert a.dom.html['Test Company']
   end
 end

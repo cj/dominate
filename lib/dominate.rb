@@ -1,5 +1,6 @@
 require "nokogiri"
 require "dominate/version"
+require "dominate/inflectors"
 
 module Dominate
   class << self
@@ -44,8 +45,6 @@ module Dominate
   class Scope < Struct.new :instance, :root_doc
 
     def apply data, &block
-      @data = data
-
       root_doc.each do |doc|
         if data.is_a? Array
           doc = apply_list doc, data, &block
@@ -76,10 +75,14 @@ module Dominate
     private
 
     def apply_data doc, data, &block
+      data = data.to_deep_ostruct
+
       doc.traverse do |x|
         if x.attributes.keys.include? 'data-prop'
+          prop_val = x.attr('data-prop').to_s
+
           x.inner_html = value_for(
-            data[x.attr('data-prop').to_s.to_sym], data, doc
+            data.instance_eval(prop_val), data, doc
           )
         end
       end
@@ -106,10 +109,14 @@ module Dominate
         # dup the element
         elem = first_elem.dup
 
+        data = data.to_deep_ostruct
+
         # lets look for data-prop elements
         elem.traverse do |x|
           if x.attributes.keys.include? 'data-prop'
-            value = value_for data[x.attr('data-prop').to_s.to_sym], data, elem
+            prop_val = x.attr('data-prop').to_s
+
+            value = value_for data.instance_eval(prop_val), data, elem
             x.inner_html = value
           end
         end
