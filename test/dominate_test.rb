@@ -78,5 +78,6 @@ scope 'dominate' do
 
     a.dom.scope(:footer).apply data
     assert a.dom.html['Test Company']
+    assert a.dom.html['This should not show'] == nil
   end
 end
