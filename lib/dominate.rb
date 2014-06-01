@@ -8,10 +8,10 @@ require "dominate/dom"
 module Dominate
   extend self
 
-  attr_accessor :config, :reset_config, :load_all
+  attr_accessor :config, :reset_config
 
-  def HTML html, data = {}
-    Dom.new html, data
+  def HTML html, instance = false, data = {}
+    Dom.new html, instance, data
   end
 
   def setup

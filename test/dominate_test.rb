@@ -6,6 +6,7 @@ setup do
   Dominate.reset_config!
   Dominate.setup do |c|
     c.view_path = './test/dummy'
+    c.layout    = "#{c.view_path}/app"
   end
 
   inline_html = File.read './test/dummy/index.html'
@@ -79,5 +80,10 @@ scope 'dominate' do
     a.dom.scope(:footer).apply data
     assert a.dom.html['Test Company']
     assert a.dom.html['This should not show'] == nil
+  end
+
+  test 'layout' do |a|
+    assert a.dom.html['body']
+    assert a.dom.html['app layout']
   end
 end
