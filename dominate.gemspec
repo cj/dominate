@@ -19,10 +19,12 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "nokogiri"
+  spec.add_dependency "tilt"
 
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "cutest-cj"
   spec.add_development_dependency "pry"
   spec.add_development_dependency "awesome_print"
+  spec.add_development_dependency "slim"
 end

@@ -1,5 +1,7 @@
 require_relative 'helper'
 require 'dominate'
+require 'slim'
+
 setup do
   Dominate.reset_config!
   Dominate.setup do |c|

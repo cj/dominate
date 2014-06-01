@@ -3,6 +3,7 @@ module Dominate
     attr_accessor :raw_html, :instance, :doc
 
     PARTIAL_REGEX = /<!--\s*@partial\s*([a-zA-Z0-9\-_]*)\s*-->/
+    VIEW_TYPES    = %w(html slim haml erb)
 
     def initialize raw_html, instance = false
       @raw_html = raw_html
@@ -22,7 +23,7 @@ module Dominate
         if match = e.to_html.strip.match(PARTIAL_REGEX)
           partial = match[1]
           e.swap Nokogiri::HTML.fragment(
-            File.read "#{view_path}/#{partial}.html"
+            load_view "#{view_path}/#{partial}"
           )
         end
       end
@@ -53,6 +54,22 @@ module Dominate
 
     def view_path
       Dominate.config.view_path
+    end
+
+    def load_view path
+      html = false
+
+      VIEW_TYPES.each do |type|
+        file = "#{path}.#{type}"
+
+        if File.file? file
+          template = Tilt.new file
+          html = template.render
+          break
+        end
+      end
+
+      html
     end
   end
 end

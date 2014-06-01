@@ -1,4 +1,5 @@
 require "nokogiri"
+require "tilt"
 require "dominate/version"
 require "dominate/inflectors"
 require "dominate/scope"
