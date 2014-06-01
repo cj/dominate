@@ -48,12 +48,10 @@ module Dominate
 
       root_doc.each do |doc|
         if data.is_a? Array
-          doc = apply_list doc, data
+          doc = apply_list doc, data, &block
         else
-          doc = apply_data doc, data
+          doc = apply_data doc, data, &block
         end
-
-        block.call doc if block
       end
 
       root_doc
@@ -62,7 +60,8 @@ module Dominate
     def apply_instance
       root_doc.traverse do |x|
         if defined?(x.attributes) && x.attributes.keys.include?('data-instance')
-          method  = x.attr('data-instance')
+          method  = x.attr 'data-instance'
+
           begin
             x.inner_html = instance.instance_eval method
           rescue
@@ -76,14 +75,17 @@ module Dominate
 
     private
 
-    def apply_data doc, data
+    def apply_data doc, data, &block
       doc.traverse do |x|
         if x.attributes.keys.include? 'data-prop'
+          x.inner_html = value_for(
+            data[x.attr('data-prop').to_s.to_sym], data, doc
+          )
         end
       end
     end
 
-    def apply_list doc, data_list
+    def apply_list doc, data_list, &block
       # child placement
       placement = 'after'
       # clean the html, removing spaces and returns
@@ -107,25 +109,34 @@ module Dominate
         # lets look for data-prop elements
         elem.traverse do |x|
           if x.attributes.keys.include? 'data-prop'
-            value = data[x.attr('data-prop').to_s.to_sym]
-
-            if value.is_a? Proc
-              x.inner_html = if value.parameters.length > 0
-                instance.instance_exec(data, &value).to_s
-              else
-                instance.instance_exec(&value).to_s
-              end
-            else
-              x.inner_html = value.to_s
-            end
+            value = value_for data[x.attr('data-prop').to_s.to_sym], data, elem
+            x.inner_html = value
           end
         end
 
+        block.call elem, data if block
         # add the element back to the doc
         doc.children.public_send(placement, elem)
       end
 
       doc
     end
+
+    private
+
+    def value_for value, data, elem
+      if value.is_a? Proc
+        if value.parameters.length == 0
+          instance.instance_exec(&value).to_s
+        elsif value.parameters.length == 1
+          instance.instance_exec(data, &value).to_s
+        elsif value.parameters.length == 2
+          instance.instance_exec(data, elem, &value).to_s
+        end
+      else
+        value.to_s
+      end
+    end
+
   end
 end

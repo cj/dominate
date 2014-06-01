@@ -51,6 +51,7 @@ scope 'dominate' do
       { todo: 'get cookies' },
       { todo: 'work out' },
     ])
+
     assert a.dom.html['test'] == nil
     assert a.dom.html.scan(/<a.*>/).length == 3
     assert a.dom.html['get milk']
