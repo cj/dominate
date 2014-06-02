@@ -47,7 +47,7 @@ module Dominate
 
     def apply_list doc, data_list, &block
       # child placement
-      placement = 'after'
+      placement = 'add_child'
       # clean the html, removing spaces and returns
       doc.inner_html = doc.inner_html.strip
       # grab the first element before we remove the rest
@@ -55,7 +55,7 @@ module Dominate
       # remove all the children
       doc.children.each_with_index do |node, index|
         if "#{node}"['data-scope']
-          placement = (index == 0 ? 'after' : 'before')
+          placement = (index == 0 ? 'add_child' : 'before')
         else
           node.remove
         end
@@ -66,21 +66,30 @@ module Dominate
         # dup the element
         elem = first_elem.dup
 
-        data = data.to_deep_ostruct
+        data = data.to_deep_ostruct if data.is_a? Hash
 
         # lets look for data-prop elements
         elem.traverse do |x|
           if x.attributes.keys.include? 'data-prop'
             prop_val = x.attr('data-prop').to_s
 
-            value = value_for data.instance_eval(prop_val), data, elem
+            if prop_val.length > 0
+              value = value_for data.instance_eval(prop_val), data, elem
+            else
+              value = value_for data, data, elem
+            end
             x.inner_html = value
           end
         end
 
         block.call elem, data if block
+
         # add the element back to the doc
-        doc.children.public_send(placement, elem)
+        if placement == 'add_child'
+          doc.add_child elem
+        elsif placement == 'before'
+          doc.children.before elem
+        end
       end
 
       doc

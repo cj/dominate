@@ -93,4 +93,11 @@ scope 'dominate' do
     dom = Dominate::HTML.file 'index'
     assert dom.html['data-scope']
   end
+
+  test 'flat' do
+    dom = Dominate::HTML.file 'flat'
+    dom.scope(:flat).apply ['moo', 'cow']
+    assert dom.html['Moo']
+    assert dom.html['Cow']
+  end
 end
