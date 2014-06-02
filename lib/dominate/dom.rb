@@ -5,7 +5,6 @@ module Dominate
     YIELD_REGEX          = /<!--(?:\s*|)@yield(?:\s*|)-->/
     PARTIAL_REGEX        = /<!--(?:\s*|)@partial(?:\s*|)([a-zA-Z0-9\-_]*)(?:\s*|)-->/
     PARTIAL_REGEX_WITHIN = /<!--(?:\s*|)@partial(?:\s*|)([a-zA-Z0-9\-_]*)(?:\s*|)-->(.*?)<!--(?:\s*|)\/partial(?:\s*|)([a-zA-Z0-9\-_]*)(?:\s*|)-->/m
-    VIEW_TYPES           = %w(html slim haml erb md markdown mkd mab)
 
     def initialize raw_html, instance = false, config = {}
       @raw_html = raw_html
@@ -22,7 +21,7 @@ module Dominate
       updated_html = doc.inner_html.gsub(PARTIAL_REGEX_WITHIN) do |m|
         match   = m.strip.match(PARTIAL_REGEX)
         partial = match[1]
-        load_view "#{view_path}/#{partial}"
+        HTML.load "#{view_path}/#{partial}"
       end
 
       set_doc updated_html if updated_html
@@ -31,14 +30,14 @@ module Dominate
         if match = e.to_html.strip.match(PARTIAL_REGEX)
           partial = match[1]
           e.swap Nokogiri::HTML.fragment(
-            load_view "#{view_path}/#{partial}"
+            HTML.load "#{view_path}/#{partial}"
           )
         end
       end
     end
 
     def load_layout
-      html       = load_view config.layout
+      html       = HTML.load config.layout
       inner_html = doc.inner_html
       set_doc html.gsub YIELD_REGEX, inner_html
     end
@@ -76,23 +75,7 @@ module Dominate
     end
 
     def view_path
-      Dominate.config.view_path
-    end
-
-    def load_view path
-      html = false
-
-      VIEW_TYPES.each do |type|
-        file = "#{path}.#{type}"
-
-        if File.file? file
-          template = Tilt.new file
-          html = template.render
-          break
-        end
-      end
-
-      html
+      config.view_path
     end
   end
 end

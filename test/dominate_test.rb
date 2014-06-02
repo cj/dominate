@@ -88,4 +88,9 @@ scope 'dominate' do
     assert a.dom.html['app layout']
     assert a.dom.html.scan(/body/).length == 2
   end
+
+  test 'file' do
+    dom = Dominate::HTML.file 'index'
+    assert dom.html['data-scope']
+  end
 end
