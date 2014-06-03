@@ -7,7 +7,7 @@ module Dominate
     def file file, instance = false, config = {}
       c    = (Dominate.config.to_h.merge config).to_deep_ostruct
       path = "#{c.view_path}/#{file}"
-      html = load path
+      html = load path, c, instance
       dom  = Dom.new html, instance, config
 
       if File.file? path + '.dom'
@@ -17,7 +17,7 @@ module Dominate
       dom
     end
 
-    def load path
+    def load path, config, instance
       html = false
 
       VIEW_TYPES.each do |type|
@@ -25,7 +25,7 @@ module Dominate
 
         if File.file? file
           template = Tilt.new file
-          html = template.render
+          html     = template.render Instance.new(instance, config)
           break
         end
       end
