@@ -3,13 +3,15 @@ require "nokogiri-styles"
 require "tilt"
 require "dominate/version"
 require "dominate/inflectors"
-require "dominate/instance"
-require "dominate/html"
-require "dominate/scope"
-require "dominate/dom"
 
 module Dominate
   extend self
+
+  autoload :Instance, "dominate/instance"
+  autoload :HTML,     "dominate/html"
+  autoload :Scope,    "dominate/scope"
+  autoload :Dom,      "dominate/dom"
+
 
   attr_accessor :config, :reset_config
 
@@ -23,7 +25,10 @@ module Dominate
 
   # Resets the configuration to the default (empty hash)
   def reset_config!
-    @config = OpenStruct.new
+    @config = OpenStruct.new({
+      view_path:   './views',
+      layout:      'app'
+    })
   end
 
   def HTML html, instance = false, options = {}

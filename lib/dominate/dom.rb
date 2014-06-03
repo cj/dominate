@@ -37,7 +37,8 @@ module Dominate
     end
 
     def load_layout
-      html       = HTML.load config.layout, config, instance
+      path       = "#{config.view_path}/#{config.layout}"
+      html       = HTML.load path, config, instance
       inner_html = doc.inner_html
       set_doc html.gsub YIELD_REGEX, inner_html
     end
