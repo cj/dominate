@@ -6,8 +6,16 @@ module Dominate
 
     def file file, instance = false, config = {}
       c    = (Dominate.config.to_h.merge config).to_deep_ostruct
-      html = load "#{c.view_path}/#{file}"
-      Dom.new html, instance, config
+      path = "#{c.view_path}/#{file}"
+      html = load path
+      dom  = Dom.new html, instance, config
+
+      if File.file? path + '.dom'
+        proc = Proc.new { dom }
+        dom = eval(File.read(path + '.dom'), proc.binding)
+      end
+
+      dom
     end
 
     def load path

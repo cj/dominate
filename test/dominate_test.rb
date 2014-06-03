@@ -49,7 +49,7 @@ scope 'dominate' do
   end
 
   test 'blocks' do |a|
-    a.dom.scope(:admin_only).each do |node|
+    a.dom.scope(:admin_only) do |node|
       unless a.current_user.admin
         node.remove
       end
@@ -111,5 +111,6 @@ scope 'dominate' do
     end
 
     assert dom.html['#000']
+    assert dom.html['added via .dom file']
   end
 end

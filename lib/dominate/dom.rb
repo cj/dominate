@@ -42,9 +42,13 @@ module Dominate
       set_doc html.gsub YIELD_REGEX, inner_html
     end
 
-    def scope name
+    def scope name, &block
       reset_html
-      Scope.new instance, doc.search("[data-scope='#{name}']")
+      @scope = Scope.new instance, doc.search("[data-scope='#{name}']")
+
+      @scope.root_doc.instance_eval(&block) if block
+
+      self
     end
 
     def html
@@ -52,6 +56,12 @@ module Dominate
         apply_instance if instance
         "#{doc}"
       end
+    end
+
+    def apply data, &block
+      @scope.apply data, &block
+
+      self
     end
 
     def apply_instance
