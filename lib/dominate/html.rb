@@ -12,7 +12,7 @@ module Dominate
 
       if File.file? path + '.dom'
         proc = Proc.new { dom }
-        dom = eval(File.read(path + '.dom'), proc.binding)
+        dom = instance.instance_eval File.read(path + '.dom')
       end
 
       dom

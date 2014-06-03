@@ -103,6 +103,7 @@ scope 'dominate' do
 
   test 'styles' do
     dom = Dominate::HTML.file 'flat'
+
     dom.scope(:flat).apply ['moo', 'cow'] do |node|
       styles          = node.styles
       styles['color'] = '#000'
