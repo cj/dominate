@@ -95,14 +95,14 @@ scope 'dominate' do
   end
 
   test 'flat' do
-    dom = Dominate::HTML.file 'flat'
+    dom = Dominate::HTML.file 'flat', false, name: '.dom'
     dom.scope(:flat).apply ['moo', 'cow']
     assert dom.html['Moo']
     assert dom.html['Cow']
   end
 
   test 'styles' do
-    dom = Dominate::HTML.file 'flat'
+    dom = Dominate::HTML.file 'flat', false, name: '.dom'
 
     dom.scope(:flat).apply ['moo', 'cow'] do |node|
       styles          = node.styles

@@ -1,5 +1,5 @@
 dom.scope(:from_file) do |node|
   node.each do |n|
-    n.add_child '<div>added via .dom file</div>'
+    n.add_child "<div>added via #{name} file</div>"
   end
 end

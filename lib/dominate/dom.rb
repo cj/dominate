@@ -43,10 +43,10 @@ module Dominate
     end
 
     def scope name, &block
-      reset_html
-      @scope = Scope.new instance, doc.search("[data-scope='#{name}']")
+      root_doc = doc.search("[data-scope='#{name}']")
+      @scope   = Scope.new instance, config, root_doc
 
-      @scope.root_doc.instance_eval(&block) if block
+      Instance.new(instance, config).instance_exec(root_doc, &block) if block
 
       self
     end
@@ -66,7 +66,7 @@ module Dominate
 
     def apply_instance
       reset_html
-      Scope.new(instance, doc).apply_instance
+      Scope.new(instance, config, doc).apply_instance
     end
 
     private

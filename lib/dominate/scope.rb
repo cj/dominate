@@ -1,5 +1,5 @@
 module Dominate
-  class Scope < Struct.new :instance, :root_doc
+  class Scope < Struct.new :instance, :config, :root_doc
 
     def apply data, &block
       root_doc.each do |doc|
@@ -100,11 +100,11 @@ module Dominate
     def value_for value, data, elem
       if value.is_a? Proc
         if value.parameters.length == 0
-          instance.instance_exec(&value).to_s
+          Instance.new(instance, config).instance_exec(&value).to_s
         elsif value.parameters.length == 1
-          instance.instance_exec(data, &value).to_s
+          Instance.new(instance, config).instance_exec(data, &value).to_s
         elsif value.parameters.length == 2
-          instance.instance_exec(data, elem, &value).to_s
+          Instance.new(instance, config).instance_exec(data, elem, &value).to_s
         end
       else
         value.to_s

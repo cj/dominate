@@ -11,8 +11,7 @@ module Dominate
       dom  = Dom.new html, instance, config
 
       if File.file? path + '.dom'
-        proc = Proc.new { dom }
-        dom = instance.instance_eval File.read(path + '.dom')
+        dom = Instance.new(instance, c).instance_eval File.read(path + '.dom')
       end
 
       dom
