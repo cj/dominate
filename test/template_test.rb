@@ -1,6 +1,4 @@
 require_relative 'helper'
-require 'dominate'
-require 'slim'
 
 setup do
   Dominate.reset_config!
@@ -24,7 +22,7 @@ setup do
   })
 end
 
-scope 'dominate' do
+scope 'dominate template' do
   test 'html' do |a|
     assert a.dom.html['test']
     assert a.dom.html.scan(/<a.*>/).length == 2
@@ -113,5 +111,11 @@ scope 'dominate' do
 
     assert dom.html['#000']
     assert dom.html['added via .dom file']
+  end
+
+  test 'raise' do
+    assert_raise(Dominate::NoFileFound) do
+      Dominate::HTML.file 'no_file', false, name: '.dom'
+    end
   end
 end

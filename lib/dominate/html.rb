@@ -21,13 +21,18 @@ module Dominate
       html = false
 
       VIEW_TYPES.each do |type|
-        file = "#{path}.#{type}"
+        f = "#{path}.#{type}"
 
-        if File.file? file
-          template = Tilt.new file
+        if File.file? f
+          template = Tilt.new f
           html     = template.render Instance.new(instance, config)
           break
         end
+      end
+
+      unless html
+        raise Dominate::NoFileFound,
+          "Could't find file: #{path} with any of these extensions: #{VIEW_TYPES.join(', ')}."
       end
 
       html
