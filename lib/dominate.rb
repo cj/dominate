@@ -11,7 +11,9 @@ module Dominate
   autoload :HTML,     "dominate/html"
   autoload :Scope,    "dominate/scope"
   autoload :Dom,      "dominate/dom"
+  autoload :Widget,   "dominate/widget"
 
+  class NoFileFound < StandardError; end
 
   attr_accessor :config, :reset_config
 
@@ -27,7 +29,10 @@ module Dominate
   def reset_config!
     @config = OpenStruct.new({
       view_path:   './views',
-      layout:      'app'
+      layout:      'app',
+      widget_path: './widgets',
+      widget_url:  '/widgets',
+      widgets:     {}
     })
   end
 
