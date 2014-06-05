@@ -17,15 +17,15 @@ module Dominate
       @event        = event
       @widget_state = false
 
+      self.instance_variables.each do |n|
+        app.instance_variable_set n, self.instance_variable_get(n)
+      end
+
       event.add_observer self, :trigger_event
     end
 
     def method_missing method, *args, &block
       if app.respond_to? method
-        self.instance_variables.each do |name|
-          app.instance_variable_set name, self.instance_variable_get(name)
-        end
-
         app.send method, *args, &block
       else
         super
