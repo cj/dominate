@@ -11,6 +11,13 @@ module Dominate
           Dir.glob("#{Dominate.config.widget_path}/**/*.rb").each do |w|
             require w
           end
+
+          if defined?(Slim) && defined?(Slim::Engine)
+            Slim::Engine.set_default_options \
+              disable_escape: true,
+              use_html_safe: false,
+              disable_capture: false
+          end
         end
       end
 
@@ -30,15 +37,21 @@ module Dominate
 
         widget = req.env[:loaded_widgets][name]
 
-        begin
+        # begin
           if widget.method(state).parameters.length > 0
             resp = widget.send state, opts.to_deep_ostruct
           else
             resp = widget.send state
           end
-        rescue NoMethodError
-          raise "Please add ##{state} to #{widget.class}."
-        end
+
+          if resp.is_a? Dominate::Dom
+            resp.html
+          else
+            resp
+          end
+        # rescue NoMethodError
+        #   raise "Please add ##{state} to #{widget.class}."
+        # end
       end
     end
   end

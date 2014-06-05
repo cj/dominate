@@ -7,13 +7,14 @@ setup do
     c.widget_path = './test/dummy/widgets'
     c.widget_url  = '/widgets'
     c.widgets = {
-      some_widget: 'SomeWidget'
+      some_widget:  'SomeWidget',
+      other_widget: 'OtherWidget'
     }
   end
 
   Cuba.reset!
-  Cuba.plugin Dominate::Widget::Helper
   Cuba.use Dominate::Widget::Middleware
+  Cuba.plugin Dominate::Widget::Helper
   Cuba.define do
     on "test" do
       res.write render_widget :some_widget
@@ -31,5 +32,19 @@ scope 'dominate widget' do
     })
 
     assert resp.join.scan('Hello, World!').length == 2
+  end
+
+  test 'event' do
+    _, _, resp = Cuba.call({
+      'PATH_INFO'   => '/widgets',
+      'REQUEST_METHOD' => 'GET',
+      'rack.input'     => {},
+      'QUERY_STRING'   => 'widget_name=some_widget&widget_event=test'
+    })
+    body = resp.join
+
+    assert body['Hello, World!']
+    assert body['moo']
+    assert body['cow']
   end
 end

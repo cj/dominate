@@ -20,6 +20,27 @@ module Dominate
       event.add_observer self, :trigger_event
     end
 
+    def method_missing method, *args, &block
+      if app.respond_to? method
+        self.instance_variables.each do |name|
+          app.instance_variable_set name, self.instance_variable_get(name)
+        end
+
+        app.send method, *args, &block
+      else
+        super
+      end
+    end
+
+    def trigger widget_event, data = {}
+      widget_name = data.delete(:for)
+
+      req.env[:loaded_widgets].each do |n, w|
+        w.trigger_event (widget_name || req.params['widget_name']), widget_event,
+          data.to_deep_ostruct
+      end
+    end
+
     def trigger_event widget_name, widget_event, data = {}
       if class_events = self.class.events
         class_events.each do |class_event, opts|
@@ -33,15 +54,21 @@ module Dominate
               e = opts[:with]
             end
 
-            begin
+            # begin
               if method(e) and method(e).parameters.length > 0
-                send(e, data)
+                resp = send(e, data)
               else
-                send(e)
+                resp = send(e)
               end
-            rescue NoMethodError
-              raise "Please add ##{e} to your #{self.class}."
-            end
+
+              if resp.is_a? Dominate::Dom
+                res.write resp.html
+              else
+                resp
+              end
+            # rescue NoMethodError
+            #   raise "Please add ##{e} to your #{self.class}."
+            # end
           end
         end
       end
@@ -87,6 +114,8 @@ module Dominate
     end
 
     class << self
+      attr_accessor :events
+
       def load_all app, req, res
         event = Event.new res, req
 
@@ -105,6 +134,18 @@ module Dominate
         end
 
         [widget_name, widget_event, event]
+      end
+
+      def respond_to event, opts = {}
+        @events ||= []
+        @events << [event.to_s, opts]
+      end
+
+      def responds_to *events
+        @events ||= []
+        events.each do |event|
+          @events << [event, {}]
+        end
       end
     end
   end

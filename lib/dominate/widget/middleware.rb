@@ -1,6 +1,7 @@
 module Dominate
   class Widget
     class Middleware
+
       def initialize(app)
         @app = app
       end
@@ -9,9 +10,9 @@ module Dominate
         @env = env
 
         if widget_path
-          widget_name, widget_event, events = Widget.load_all @app, req, res
+          widget_name, widget_event, event = Widget.load_all @app, req, res
 
-          events.trigger widget_name, widget_event, req.params
+          event.trigger widget_name, widget_event, req.params
           # res.write "$('head > meta[name=csrf-token]').attr('content', '#{csrf_token}');"
           res.write '$(document).trigger("page:change");'
           res.finish
@@ -22,27 +23,22 @@ module Dominate
 
       private
 
-      def req
-        @req ||= Rack::Request.new(@env)
-      end
-
       def res
         @res ||= begin
           if not widget_path
             @app.call(req.env)
           else
-            status, headers, body = [
-              200,
-              {"Content-Type" => "text/javascript; charset=utf-8"},
-              [""]
-            ]
-            Rack::Response.new(body, status, headers)
+            Cuba::Response.new
           end
         end
       end
 
+      def req
+        @req ||= Rack::Request.new(@env)
+      end
+
       def widget_path
-        path[Regexp.new("^#{Dominate.config.widget_path}($|\\?.*)")]
+        path[Regexp.new("^#{Dominate.config.widget_url}($|\\?.*)")]
       end
 
       def path

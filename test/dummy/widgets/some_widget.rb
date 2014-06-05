@@ -1,7 +1,14 @@
 class SomeWidget < Dominate::Widget
+  respond_to :test
+
   def display
     @var = 'World!'
-    render.html
+
+    render
+  end
+
+  def test data
+    render
   end
 
   def hello

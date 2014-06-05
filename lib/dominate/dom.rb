@@ -73,7 +73,11 @@ module Dominate
     private
 
     def set_doc html
-      @doc = Nokogiri::HTML.parse html
+      if html.match(/<html.*>/)
+        @doc = Nokogiri::HTML::Document.parse html
+      else
+        @doc = Nokogiri::HTML.fragment html
+      end
     end
 
     def reset_html
