@@ -32,6 +32,77 @@ module Dominate
       end
     end
 
+    def set_state state
+      @widget_state = state
+    end
+
+    def reset_state
+      @widget_state = false
+    end
+
+    def partial template, locals = {}
+      locals[:partial] = template
+      resp = render locals
+
+      if resp.is_a? Dominate::Dom
+        resp.html
+      else
+        resp
+      end
+    end
+
+    def render_state options = {}
+      state = widget_state || options.delete(:state)
+
+      if method(state).parameters.length > 0
+        resp = send(state, options.to_deep_ostruct)
+      else
+        resp = send(state)
+      end
+
+      if resp.is_a? Dominate::Dom
+        html = "<div id='#{id_for(state)}'>#{resp.html}</div>"
+        resp.doc.inner_html = html
+        resp.reset_html
+        resp.html
+      else
+        resp
+      end
+    end
+
+    def replace state, opts = {}
+      if !state.is_a? String
+        opts[:state] = state
+        content = render_state opts
+        selector = '#' + id_for(state)
+      else
+        if !opts.key?(:content) and !opts.key?(:with)
+          opts[:state] = caller[0][/`.*'/][1..-2]
+          content = render_state opts
+        else
+          content = opts[:content] || opts[:with]
+        end
+        selector = state
+      end
+
+      res.write '$("' + selector + '").replaceWith("' + escape(content) + '");'
+      # scroll to the top of the page just as if we went to the url directly
+      # if opts[:scroll_to_top]
+      #   res.write 'window.scrollTo(0, 0);'
+      # end
+    end
+
+    def id_for state
+      w_name  = name.to_s.gsub(/_/, '-')
+      w_state = state.to_s.gsub(/_/, '-')
+
+      "#{w_name}-#{w_state}"
+    end
+
+    def escape js
+      js.to_s.gsub(/(\\|<\/|\r\n|\\3342\\2200\\2250|[\n\r"'])/) {|match| JS_ESCAPE[match] }
+    end
+
     def trigger widget_event, data = {}
       widget_name = data.delete(:for)
 
@@ -62,6 +133,9 @@ module Dominate
               end
 
               if resp.is_a? Dominate::Dom
+                html = "<div id='#{id_for(e)}'>#{resp.html}</div>"
+                resp.doc.inner_html = html
+                resp.reset_html
                 res.write resp.html
               else
                 resp
@@ -79,7 +153,7 @@ module Dominate
         locals = args.first
         # if it's a partial we add an underscore infront of it
         state = view = locals[:state] ||
-          "#{locals[:partial]}".gsub(PARTIAL_REGEX, '_\1')
+          "#{locals.delete(:partial)}".gsub(PARTIAL_REGEX, '_\1')
       else
         state = view = args.first
         locals = args.length > 1 ? args.last : {}

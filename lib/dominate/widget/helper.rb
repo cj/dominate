@@ -45,6 +45,9 @@ module Dominate
           end
 
           if resp.is_a? Dominate::Dom
+            html = "<div id='#{widget.id_for(state)}'>#{resp.html}</div>"
+            resp.reset_html
+            resp.doc.inner_html = html
             resp.html
           else
             resp
@@ -52,6 +55,11 @@ module Dominate
         # rescue NoMethodError
         #   raise "Please add ##{state} to #{widget.class}."
         # end
+      end
+
+      def url_for_event event, options = {}
+        widget_name = options.delete(:widget_name) || req.env[:widget_name]
+        "http#{req.env['SERVER_PORT'] == '443' ? 's' : ''}://#{req.env['HTTP_HOST']}#{Dominate.config.widget_url}?widget_event=#{event}&widget_name=#{widget_name}" + (options.any?? '&' + URI.encode_www_form(options) : '')
       end
     end
   end

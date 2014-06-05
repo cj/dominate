@@ -30,8 +30,10 @@ scope 'dominate widget' do
       'REQUEST_METHOD' => 'GET',
       'rack.input'     => {}
     })
+    body = resp.join
 
-    assert resp.join.scan('Hello, World!').length == 2
+    assert body.scan('Hello, World!').length == 2
+    assert body['some-widget-display']
   end
 
   test 'event' do
@@ -46,5 +48,7 @@ scope 'dominate widget' do
     assert body['Hello, World!']
     assert body['moo']
     assert body['cow']
+    assert body['some-widget-display']
+    assert body['some-widget-test']
   end
 end

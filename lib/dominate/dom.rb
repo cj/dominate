@@ -70,18 +70,14 @@ module Dominate
       Scope.new(instance, config, doc).apply_instance
     end
 
+    def reset_html
+      @html = false
+    end
+
     private
 
     def set_doc html
-      if html.match(/<html.*>/)
-        @doc = Nokogiri::HTML::Document.parse html
-      else
-        @doc = Nokogiri::HTML.fragment html
-      end
-    end
-
-    def reset_html
-      @html = false
+      @doc = Nokogiri::HTML.parse html
     end
 
     def view_path

@@ -6,7 +6,11 @@ module Dominate
         @app = app
       end
 
-      def call(env)
+      def call env
+        dup.call! env
+      end
+
+      def call! env
         @env = env
 
         if widget_path

@@ -14,7 +14,7 @@ module Dominate
     def method_missing method, *args, &block
       if @__config__.respond_to? method
         @__config__.send method, *args, &block
-      elsif @__instance__.respond_to? method, *args, &block
+      elsif @__instance__.respond_to? method
         @__instance__.send method, *args, &block
       else
         @__instance__.send 'method_missing', method, *args, &block
