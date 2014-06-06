@@ -25,7 +25,7 @@ module Dominate
 
         if File.file? f
           template = Tilt.new f
-          html     = template.render Instance.new(instance, config)
+          html     = template.render instance, config.to_h
           break
         end
       end

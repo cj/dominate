@@ -13,9 +13,18 @@ setup do
   end
 
   Cuba.reset!
-  Cuba.use Dominate::Widget::Middleware
+  # Cuba.use Dominate::Widget::Middleware
   Cuba.plugin Dominate::Widget::Helper
   Cuba.define do
+
+    on "widgets" do
+      widget_name, widget_event, event = Dominate::Widget.load_all self, req, res
+
+      event.trigger widget_name, widget_event, req.params
+      # res.write "$('head > meta[name=csrf-token]').attr('content', '#{csrf_token}');"
+      res.write '$(document).trigger("page:change");'
+    end
+
     on "test" do
       res.write render_widget :some_widget
     end
@@ -39,6 +48,7 @@ scope 'dominate widget' do
   test 'event' do
     _, _, resp = Cuba.call({
       'PATH_INFO'   => '/widgets',
+      'SCRIPT_NAME'   => '/widgets',
       'REQUEST_METHOD' => 'GET',
       'rack.input'     => {},
       'QUERY_STRING'   => 'widget_name=some_widget&widget_event=test'
