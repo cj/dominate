@@ -18,10 +18,12 @@ module Dominate
     def load_html
       load_layout if config.layout
 
-      updated_html = doc.inner_html.gsub(PARTIAL_REGEX_WITHIN) do |m|
+      inner_html = doc.inner_html
+
+      updated_html = inner_html.gsub(PARTIAL_REGEX_WITHIN) do |m|
         match   = m.strip.match(PARTIAL_REGEX)
         partial = match[1]
-        HTML.load "#{view_path}/#{partial}", config, instance
+        HTML.load_file "#{view_path}/#{partial}", config, instance
       end
 
       set_doc updated_html if updated_html
@@ -30,7 +32,7 @@ module Dominate
         if match = e.to_html.strip.match(PARTIAL_REGEX)
           partial = match[1]
           e.swap Nokogiri::HTML.fragment(
-            HTML.load "#{view_path}/#{partial}", config, instance
+            HTML.load_file "#{view_path}/#{partial}", config, instance
           )
         end
       end
@@ -38,7 +40,7 @@ module Dominate
 
     def load_layout
       path       = "#{config.view_path}/#{config.layout}"
-      html       = HTML.load path, config, instance
+      html       = HTML.load_file path, config, instance
       inner_html = doc.inner_html
       set_doc html.gsub YIELD_REGEX, inner_html
     end
@@ -77,7 +79,7 @@ module Dominate
     private
 
     def set_doc html
-      @doc = Nokogiri::HTML.parse html
+      @doc = Nokogiri::HTML html
     end
 
     def view_path
