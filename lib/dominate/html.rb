@@ -19,7 +19,7 @@ module Dominate
       dom
     end
 
-    def load_file path, config, instance
+    def load_file path, c, instance
       html = _cache.fetch(path) {
         template = false
 
@@ -38,7 +38,7 @@ module Dominate
         end
 
         template
-      }.render instance, config.to_h
+      }.render instance, c.to_h
 
       html
     end

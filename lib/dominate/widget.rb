@@ -60,11 +60,14 @@ module Dominate
         resp = send(state)
       end
 
-      if resp.is_a? Dominate::Dom
-        html = "<div id='#{id_for(state)}'>#{resp.html}</div>"
-        resp.doc.inner_html = html
-        resp.reset_html
-        resp.html
+      # if resp.is_a? Dominate::Dom
+      #   html = "<div id='#{id_for(state)}'>#{resp.html}</div>"
+      #   resp.doc.inner_html = html
+      #   resp.reset_html
+      #   resp.html
+      if resp.is_a? String
+        html = "<div id='#{id_for(state)}'>#{resp}</div>"
+        html
       else
         resp
       end
@@ -132,11 +135,14 @@ module Dominate
                 resp = send(e)
               end
 
-              if resp.is_a? Dominate::Dom
-                html = "<div id='#{id_for(e)}'>#{resp.html}</div>"
-                resp.doc.inner_html = html
-                resp.reset_html
-                res.write resp.html
+              # if resp.is_a? Dominate::Dom
+              #   html = "<div id='#{id_for(e)}'>#{resp.html}</div>"
+              #   resp.doc.inner_html = html
+              #   resp.reset_html
+              #   res.write resp.html
+              if resp.is_a? String
+                html = "<div id='#{id_for(e)}'>#{html}</div>"
+                res.write html
               else
                 resp
               end

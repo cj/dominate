@@ -34,9 +34,11 @@ class DeepOpenStruct < OpenStruct
 
         if v.is_a? Array
           @table[k.to_sym] ||= []
+          @hash_table[k.to_sym] ||= []
 
           v.each { | entry |
             @table[k.to_sym] << entry
+            @hash_table[k.to_sym] << entry
           }
         else
           @table[k.to_sym] = (v.is_a?(Hash) ? self.class.new(v) : v)
