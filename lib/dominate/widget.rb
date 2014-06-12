@@ -107,6 +107,7 @@ module Dominate
     end
 
     def trigger widget_event, data = {}
+      data        = data.to_h
       widget_name = data.delete(:for)
 
       req.env[:loaded_widgets].each do |n, w|
