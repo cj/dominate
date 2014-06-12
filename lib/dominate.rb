@@ -12,6 +12,7 @@ module Dominate
   autoload :Scope,    "dominate/scope"
   autoload :Dom,      "dominate/dom"
   autoload :Widget,   "dominate/widget"
+  autoload :Mapper,   "dominate/mapper"
 
   class NoFileFound < StandardError; end
 
