@@ -20,8 +20,6 @@ module Dominate
       self.instance_variables.each do |n|
         app.instance_variable_set n, self.instance_variable_get(n)
       end
-
-      event.add_observer self, :trigger_event
     end
 
     def method_missing method, *args, &block
@@ -108,19 +106,16 @@ module Dominate
 
     def trigger widget_event, data = {}
       data        = data.to_h
-      widget_name = data.delete(:for)
+      widget_name = data.delete(:for) || req.params['widget_name']
 
-      req.env[:loaded_widgets].each do |n, w|
-        w.trigger_event (widget_name || req.params['widget_name']), widget_event,
-          data.to_deep_ostruct
-      end
+      event.trigger widget_name, widget_event, data.to_h
     end
 
     def trigger_event widget_name, widget_event, data = {}
       if class_events = self.class.events
         class_events.each do |class_event, opts|
           if class_event.to_s == widget_event.to_s && (
-            widget_name.to_s == name or
+            widget_name.to_s == name.to_s or
             opts[:for].to_s == widget_name.to_s
           )
             if not opts[:with]
@@ -142,7 +137,7 @@ module Dominate
               #   resp.reset_html
               #   res.write resp.html
               if resp.is_a? String
-                html = "<div id='#{id_for(e)}'>#{html}</div>"
+                html = "<div id='#{id_for(e)}'>#{resp}</div>"
                 res.write html
               else
                 resp
@@ -153,6 +148,11 @@ module Dominate
           end
         end
       end
+    end
+
+    def url_for_event event, options = {}
+      widget_name = options.delete(:widget_name) || name
+      "http#{req.env['SERVER_PORT'] == '443' ? 's' : ''}://#{req.env['HTTP_HOST']}#{Dominate.config.widget_url}?widget_event=#{event}&widget_name=#{widget_name}" + (options.any?? '&' + URI.encode_www_form(options) : '')
     end
 
     def render *args
@@ -197,9 +197,7 @@ module Dominate
     class << self
       attr_accessor :events
 
-      def load_all app, req, res
-        event = Event.new res, req
-
+      def load_all app, event, req, res
         if widget_event = req.params["widget_event"]
           widget_name = req.params["widget_name"]
         end
@@ -207,10 +205,13 @@ module Dominate
         unless req.env[:loaded_widgets]
           req.env[:loaded_widgets] ||= {}
 
-          Dominate.config.widgets.each do |name, widget|
-            req.env[:loaded_widgets][name] = Object.const_get(widget).new(
+          Dominate.config.widgets.each do |name, widget_class_name|
+            widget = Object.const_get(widget_class_name).new(
               app, res, req, name, event
             )
+            event.register_for_event(event: :trigger, listener: widget, callback: :trigger_event)
+
+            req.env[:loaded_widgets][name] = widget
           end
         end
 
