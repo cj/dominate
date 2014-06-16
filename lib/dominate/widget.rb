@@ -106,9 +106,9 @@ module Dominate
 
     def trigger widget_event, data = {}
       data        = data.to_h
-      widget_name = data.delete(:for) || name
+      widget_name = data.has_key?(:for) ? data.delete(:for) : name
 
-      event.trigger widget_name.to_sym, widget_event, data.to_h
+      event.trigger widget_name, widget_event, data.to_h
       # threads = []
       #
       # req.env[:loaded_widgets].each do |n, w|
@@ -127,7 +127,7 @@ module Dominate
       if class_events = self.class.events
         class_events.each do |class_event, opts|
           if class_event.to_s == widget_event.to_s && (
-            widget_name.to_s == name.to_s or
+           (widget_name.to_s == name.to_s && !opts.has_key?(:for)) or
             opts[:for].to_s == widget_name.to_s
           )
             if not opts[:with]
