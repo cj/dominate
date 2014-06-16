@@ -106,9 +106,21 @@ module Dominate
 
     def trigger widget_event, data = {}
       data        = data.to_h
-      widget_name = data.delete(:for) || req.params['widget_name']
+      widget_name = data.delete(:for) || name
 
-      event.trigger widget_name, widget_event, data.to_h
+      event.trigger widget_name.to_sym, widget_event, data.to_h
+      # threads = []
+      #
+      # req.env[:loaded_widgets].each do |n, w|
+      #   threads << Thread.new do
+      #     ThreadUtility.with_connection do
+      #       ap widget_name
+      #       w.trigger_event widget_name, widget_event, data.to_deep_ostruct
+      #     end
+      #   end
+      # end
+      #
+      # threads.map(&:join)
     end
 
     def trigger_event widget_name, widget_event, data = {}
