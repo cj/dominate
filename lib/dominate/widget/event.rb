@@ -44,7 +44,7 @@ module Eventable
     }
 
     threads.map(&:join)
-    ActiveRecord::Base.clear_stale_cached_connections! if defined? ActiveRecord
+    ActiveRecord::Base.connection_pool.clear_stale_cached_connections! if defined? ActiveRecord
 
     true
   end
