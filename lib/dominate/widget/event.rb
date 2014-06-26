@@ -44,7 +44,11 @@ module Eventable
     }
 
     threads.map(&:join)
-    ActiveRecord::Base.connection_pool.clear_stale_cached_connections! if defined? ActiveRecord
+
+    # Recover lost connections for the pool. A lost connection can occur if a
+    # programmer forgets to checkin a connection at the end of a thread or a
+    # thread dies unexpectedly.
+    ActiveRecord::Base.connection_pool.reap if defined? ActiveRecord
 
     true
   end
