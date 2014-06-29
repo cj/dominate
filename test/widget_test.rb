@@ -18,7 +18,9 @@ setup do
   Cuba.define do
 
     on "widgets" do
-      widget_name, widget_event, event = Dominate::Widget.load_all self, req, res
+      @dominate_event ||= Dominate::Widget::Event.new
+
+      widget_name, widget_event, event = Dominate::Widget.load_all self, @dominate_event, req, res
 
       event.trigger widget_name, widget_event, req.params
       # res.write "$('head > meta[name=csrf-token]').attr('content', '#{csrf_token}');"

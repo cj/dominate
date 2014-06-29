@@ -22,7 +22,7 @@ module Dominate
       end
 
       def render_widget *args
-        Widget.load_all(self, req, res)
+        @dominate_widgets ||= Widget.load_all(self, Event.new, req, res)
 
         if args.first.kind_of? Hash
           opts = args.first
@@ -61,7 +61,7 @@ module Dominate
       end
 
       def url_for_event event, options = {}
-        widget_name = options.delete(:widget_name) || req.env[:widget_name]
+        widget_name = options.delete(:widget_name)
         "http#{req.env['SERVER_PORT'] == '443' ? 's' : ''}://#{req.env['HTTP_HOST']}#{Dominate.config.widget_url}?widget_event=#{event}&widget_name=#{widget_name}" + (options.any?? '&' + URI.encode_www_form(options) : '')
       end
     end
