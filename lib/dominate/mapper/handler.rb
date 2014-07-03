@@ -23,12 +23,8 @@ module Dominate
       #
       # @param [String, Symbol] name
       # @param [Proc] callback
-      def setup_element_callback(name, attributes, callback)
-        (@elements_callbacks[name.to_sym] ||= {
-          attributes: attributes,
-          callbacks: []
-        })
-        @elements_callbacks[name.to_sym][:callbacks] << callback.to_proc
+      def setup_element_callback(name, callback)
+        (@elements_callbacks[name.to_sym] ||= []) << callback.to_proc
       end
 
       # Collect values of attributes with given +attribute_name+
@@ -56,11 +52,9 @@ module Dominate
       def end_element(*)
         element = @stack.pop
 
-        if collect_element?(element.name) \
-          && (
-            (attributes_for(element) & element.attributes.keys).present? \
-            || (attributes_for(element) == element.attributes.keys)
-          )
+        ap element.attributes.keys
+        ap attributes_for element
+        if collect_element?(element.name)
           encode(element.text)
 
           @elements_callbacks[element.name].each { |cb| cb.call(element) }
@@ -68,7 +62,7 @@ module Dominate
       end
 
       def attributes_for element
-        @attributes[element.name] || []
+        @attributes[element.name] || @attributes[:*] || []
       end
 
       # attributes handler assigns attribute value to current element
@@ -95,7 +89,6 @@ module Dominate
       alias cdata text
 
       private
-
       def collect_element?(element)
         element && @elements_callbacks.has_key?(element)
       end

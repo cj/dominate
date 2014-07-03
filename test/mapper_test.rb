@@ -8,6 +8,7 @@ setup do
     html: <<-D
       <div>
         <span data-instance="test"></span>
+        <span>moo</span>
       </div>
     D
   })
@@ -15,27 +16,9 @@ end
 
 scope 'mapper' do
   test 'on' do |a|
-    a.mapper.on attributes: 'data-instance' do |e|
+    a.mapper.on :span, attributes: 'data-instance' do |e|
       ap '==========='
       ap e
-      ap '==========='
-    end
-
-    a.mapper.on attributes: 'data-empty' do |e|
-      ap '==========='
-      ap e
-      ap '==========='
-    end
-
-    a.mapper.on :span, attributes: 'data-empty' do |e|
-      ap '==========='
-      ap 'this should not show'
-      ap '==========='
-    end
-
-    a.mapper.on :span do |e|
-      ap '==========='
-      ap 'this should should show'
       ap '==========='
     end
 

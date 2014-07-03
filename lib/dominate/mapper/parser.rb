@@ -1,5 +1,12 @@
 module Dominate
   module Mapper
+    # Configurable SAX-parser
+    #
+    # Usage:
+    #   parser = Mapper.new
+    #
+    #   parser.on(:offer) { |offer| puts offer }
+    #   parser.on(:offer => [:id]) { |v| v.to_i }
     class Parser
       def initialize
         @handler = Handler.new
@@ -25,16 +32,8 @@ module Dominate
 
         attributes = Array(options[:attributes]).flatten
 
-        if elements.any?
-          elements.each do |e|
-            @handler.setup_element_callback(e, attributes, block)
-
-            attributes.each { |attr| @handler.collect_attribute(e, attr) }
-          end
-        else
-          e = :'*'
-
-          @handler.setup_element_callback(e, attributes, block)
+        elements.each do |e|
+          @handler.setup_element_callback(e, block)
 
           attributes.each { |attr| @handler.collect_attribute(e, attr) }
         end
@@ -57,6 +56,7 @@ module Dominate
           Array(attributes).flatten.each { |attr| @handler.collect_attribute(k, attr) }
         end
       end
-    end
+      alias on_attribute collect_attribute
+    end # class Parser
   end
 end
