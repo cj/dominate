@@ -2,7 +2,7 @@ module Dominate
   module HTML
     extend self
 
-    VIEW_TYPES           = %w(html slim haml erb md markdown mkd mab)
+    VIEW_TYPES = %w(html slim haml erb md markdown mkd mab)
 
     def file file, instance = false, config = {}
       c    = (Dominate.config.to_h.merge config).to_deep_ostruct
