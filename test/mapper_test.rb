@@ -7,7 +7,7 @@ setup do
     mapper: mapper,
     html: <<-D
       <div>
-        <span data-instance="test"></span>
+        <span data-instance="test">cow</span>
         <span>moo</span>
       </div>
     D
@@ -17,9 +17,7 @@ end
 scope 'mapper' do
   test 'on' do |a|
     a.mapper.on :span, attributes: 'data-instance' do |e|
-      ap '==========='
-      ap e
-      ap '==========='
+      e.text = 'changed'
     end
 
     a.mapper.parse a.html

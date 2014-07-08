@@ -40,7 +40,7 @@ module Dominate
       #
       # @api private
       def start_element(name)
-        element = Element.new(name, @line, @column)
+        element        = Element.new(name, @line, @column)
         element.parent = top
 
         @stack.push(element)
@@ -52,13 +52,25 @@ module Dominate
       def end_element(*)
         element = @stack.pop
 
-        ap element.attributes.keys
-        ap attributes_for element
-        if collect_element?(element.name)
+        if collect_element?(element.name) && has_attributes?(element)
           encode(element.text)
 
-          @elements_callbacks[element.name].each { |cb| cb.call(element) }
+          @elements_callbacks[element.name].each do |cb|
+            cb.call(element)
+          end
         end
+      end
+
+      def has_attributes? element
+        element_keys = element.attributes.keys
+        attributes   = attributes_for element
+        has_all      = true
+
+        attributes.each do |attribute|
+          has_all &= element_keys.include? attribute.to_sym
+        end
+
+        has_all
       end
 
       def attributes_for element
