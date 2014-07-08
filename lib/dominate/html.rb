@@ -14,7 +14,7 @@ module Dominate
           dom_cache = (_dom_cache[path] = Dom.new(html, instance, config))
         end
 
-        dom = dom_cache.dup
+        dom = dom_cache
 
         if File.file? path + '.dom'
           dom = Instance.new(instance, c).instance_eval File.read(path + '.dom')
