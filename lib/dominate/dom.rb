@@ -26,23 +26,19 @@ module Dominate
         HTML.load_file "#{view_path}/#{partial}", config, instance
       end
 
-      set_doc updated_html if updated_html
-
-      doc.traverse do |e|
-        if match = e.to_html.strip.match(PARTIAL_REGEX)
-          partial = match[1]
-          e.swap Nokogiri::HTML.fragment(
-            HTML.load_file "#{view_path}/#{partial}", config, instance
-          )
-        end
+      updated_html = updated_html.gsub(PARTIAL_REGEX) do |m|
+        partial = $~.captures.first
+        HTML.load_file "#{view_path}/#{partial}", config, instance
       end
+
+      set_doc updated_html
     end
 
     def load_layout
       path       = "#{config.view_path}/#{config.layout}"
       html       = HTML.load_file path, config, instance
       inner_html = doc.inner_html
-      set_doc html.gsub YIELD_REGEX, inner_html
+      doc.inner_html = html.gsub YIELD_REGEX, inner_html
     end
 
     def scope name, &block

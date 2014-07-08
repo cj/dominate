@@ -2,15 +2,18 @@ module Dominate
   module HTML
     extend self
 
-    VIEW_TYPES = %w(html slim haml erb md markdown mkd mab)
+    VIEW_TYPES           = %w(html slim haml erb md markdown mkd mab)
 
     def file file, instance = false, config = {}
       c    = (Dominate.config.to_h.merge config).to_deep_ostruct
       path = "#{c.view_path}/#{file}"
-      dom = load_file path, c, instance
+      html = load_file path, c, instance
 
-      # todo> try https://github.com/ohler55/ox instead 
-      dom  = Dom.new dom, instance, config
+      unless dom_cache = _dom_cache[path]
+        dom_cache = (_dom_cache[path] = Dom.new(html, instance, config))
+      end
+
+      dom = dom_cache.dup
 
       if File.file? path + '.dom'
         dom = Instance.new(instance, c).instance_eval File.read(path + '.dom')
@@ -27,7 +30,7 @@ module Dominate
           f = "#{path}.#{type}"
 
           if File.file? f
-            template = Tilt.new f, 1, outvar: '@_output'
+            template = ::Tilt.new f, 1, outvar: '@_output'
             break
           end
         end
@@ -43,11 +46,16 @@ module Dominate
       html
     end
 
+    private
+
     # @private Used internally by #render to cache the
     #          Tilt templates.
     def _cache
       Thread.current[:_cache] ||= Tilt::Cache.new
     end
-    private :_cache
+
+    def _dom_cache
+      Thread.current[:_dom_cache] ||= {}
+    end
   end
 end
