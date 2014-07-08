@@ -10,12 +10,12 @@ module Dominate
       dom = load_file path, c, instance
 
       # todo> try https://github.com/ohler55/ox instead 
-      # dom  = Dom.new html, instance, config
-      #
-      # if File.file? path + '.dom'
-      #   dom = Instance.new(instance, c).instance_eval File.read(path + '.dom')
-      # end
-      #
+      dom  = Dom.new dom, instance, config
+
+      if File.file? path + '.dom'
+        dom = Instance.new(instance, c).instance_eval File.read(path + '.dom')
+      end
+
       dom
     end
 

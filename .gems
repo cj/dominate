@@ -1,0 +1,6 @@
+tilt -v 2.0.1
+eventable -v 0.1.4
+slim -v 2.0.3
+cuba -v 3.1.1
+nokogiri -v 1.6.2.1
+nokogiri-styles -v 0.1.2

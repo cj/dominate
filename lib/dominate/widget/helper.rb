@@ -44,12 +44,13 @@ module Dominate
             resp = widget.send state
           end
 
-          # if resp.is_a? Dominate::Dom
-          #   html = "<div id='#{widget.id_for(state)}'>#{resp.html}</div>"
-          #   resp.reset_html
-          #   resp.doc.inner_html = html
-          #   resp.html
-          if resp.is_a? String
+          if resp.is_a? Dominate::Dom
+            html = "<div id='#{widget.id_for(state)}'>#{resp.html}</div>"
+            # resp.reset_html
+            # resp.doc.inner_html = html
+            # resp.html
+            html
+          elsif resp.is_a? String
             html = "<div id='#{widget.id_for(state)}'>#{resp}</div>"
             html
           else
