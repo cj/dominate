@@ -1,5 +1,3 @@
-require "nokogiri"
-require "nokogiri-styles"
 require "tilt"
 require "dominate/version"
 require "dominate/inflectors"
