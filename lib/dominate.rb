@@ -32,7 +32,8 @@ module Dominate
       layout:      'app',
       widget_path: './widgets',
       widget_url:  '/widgets',
-      widgets:     {}
+      widgets:     {},
+      parse_dom:   false
     })
   end
 

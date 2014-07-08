@@ -5,6 +5,7 @@ setup do
   Dominate.setup do |c|
     c.view_path = './test/dummy'
     c.layout    = "app"
+    c.parse_dom = true
   end
 
   inline_html = File.read './test/dummy/index.html'

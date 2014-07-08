@@ -9,17 +9,21 @@ module Dominate
       path = "#{c.view_path}/#{file}"
       html = load_file path, c, instance
 
-      unless dom_cache = _dom_cache[path]
-        dom_cache = (_dom_cache[path] = Dom.new(html, instance, config))
+      if c.parse_dom
+        unless dom_cache = _dom_cache[path]
+          dom_cache = (_dom_cache[path] = Dom.new(html, instance, config))
+        end
+
+        dom = dom_cache.dup
+
+        if File.file? path + '.dom'
+          dom = Instance.new(instance, c).instance_eval File.read(path + '.dom')
+        end
+
+        dom
+      else
+        html
       end
-
-      dom = dom_cache.dup
-
-      if File.file? path + '.dom'
-        dom = Instance.new(instance, c).instance_eval File.read(path + '.dom')
-      end
-
-      dom
     end
 
     def load_file path, c, instance

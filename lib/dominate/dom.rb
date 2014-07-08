@@ -32,6 +32,15 @@ module Dominate
       end
 
       set_doc updated_html
+
+      # doc.traverse do |e|
+      #   if match = e.to_html.strip.match(PARTIAL_REGEX)
+      #     partial = match[1]
+      #     e.swap Nokogiri::HTML.fragment(
+      #       HTML.load_file "#{view_path}/#{partial}", config, instance
+      #     )
+      #   end
+      # end
     end
 
     def load_layout
