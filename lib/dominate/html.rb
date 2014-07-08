@@ -27,7 +27,7 @@ module Dominate
           f = "#{path}.#{type}"
 
           if File.file? f
-            template = Tilt.new f, 1, outvar: '@_output'
+            template = ::Tilt.new f, 1, outvar: '@_output'
             break
           end
         end
@@ -44,9 +44,9 @@ module Dominate
     end
 
     # @private Used internally by #render to cache the
-    #          Tilt templates.
+    #          ::Tilt templates.
     def _cache
-      Thread.current[:_cache] ||= Tilt::Cache.new
+      Thread.current[:_cache] ||= ::Tilt::Cache.new
     end
     private :_cache
   end
