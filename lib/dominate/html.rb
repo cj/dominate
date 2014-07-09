@@ -26,18 +26,18 @@ module Dominate
       end
     end
 
-    def load_file path, c, instance
+    def load_file path, c = {}, instance = self
       html = _cache.fetch(path) {
         template = false
 
         if path[/\..*$/] && File.file?(path)
-          template = ::Tilt.new path, 1, outvar: '@_output'
+          template = Tilt.new path, 1, outvar: '@_output'
         else
           VIEW_TYPES.each do |type|
             f = "#{path}.#{type}"
 
             if File.file? f
-              template = ::Tilt.new f, 1, outvar: '@_output'
+              template = Tilt.new f, 1, outvar: '@_output'
               break
             end
           end

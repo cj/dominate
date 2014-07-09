@@ -2,7 +2,7 @@ require 'rack/mime'
 
 module Dominate
   module Assets
-    module Middleware
+    class Middleware
       STATIC_TYPES = %w(js css)
 
       attr_reader :app, :env, :res
@@ -116,7 +116,7 @@ module Dominate
         if STATIC_TYPES.include? ext
           File.read path
         else
-          Dominate::Tilt.load_file path
+          Dominate::HTML.load_file path
         end
       end
     end

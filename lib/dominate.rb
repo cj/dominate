@@ -12,6 +12,7 @@ module Dominate
   autoload :Scope,    "dominate/scope"
   autoload :Dom,      "dominate/dom"
   autoload :Widget,   "dominate/widget"
+  autoload :Assets,   "dominate/assets"
 
   class NoFileFound < StandardError; end
 
@@ -30,6 +31,7 @@ module Dominate
     @config = OpenStruct.new({
       parse_dom:   false,
       layout:      'app',
+      layout_path: './views/layouts',
       view_path:   './views',
       widget_path: './widgets',
       widget_url:  '/widgets',
