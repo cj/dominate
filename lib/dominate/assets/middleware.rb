@@ -3,7 +3,7 @@ require 'rack/mime'
 module Dominate
   module Assets
     class Middleware
-      STATIC_TYPES = %w(js css)
+      STATIC_TYPES = %w(html js css eot woff ttf svg)
 
       attr_reader :app, :env, :res
 
