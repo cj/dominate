@@ -96,7 +96,7 @@ module Dominate
       def render_all_files
         content = ''
         files   = Dominate.config.assets[ext]
-        path    = "#{Dominate.config.assets_path}/#{type}"
+        path    = "#{Dominate.config.asset_path}/#{type}"
 
         files.each do |file|
           content += load_file "#{path}/#{file}"
@@ -106,7 +106,7 @@ module Dominate
       end
 
       def render_single_file
-        path  = "#{Dominate.config.assets_path}/#{type}"
+        path  = "#{Dominate.config.asset_path}/#{type}"
         load_file "#{path}/#{name}.#{ext}"
       end
 
