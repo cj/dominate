@@ -28,12 +28,18 @@ module Dominate
   # Resets the configuration to the default (empty hash)
   def reset_config!
     @config = OpenStruct.new({
-      view_path:   './views',
+      parse_dom:   false,
       layout:      'app',
+      view_path:   './views',
       widget_path: './widgets',
       widget_url:  '/widgets',
       widgets:     {},
-      parse_dom:   false
+      assets: OpenStruct.new({
+        js: {},
+        css: {}
+      }),
+      asset_url:  '/assets',
+      asset_path: './assets'
     })
   end
 

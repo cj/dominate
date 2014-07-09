@@ -14,7 +14,7 @@ module Dominate
           dom_cache = (_dom_cache[path] = Dom.new(html, instance, config))
         end
 
-        dom = dom_cache
+        dom = dom_cache.dup
 
         if File.file? path + '.dom'
           dom = Instance.new(instance, c).instance_eval File.read(path + '.dom')
@@ -30,12 +30,16 @@ module Dominate
       html = _cache.fetch(path) {
         template = false
 
-        VIEW_TYPES.each do |type|
-          f = "#{path}.#{type}"
+        if path[/\..*$/] && File.file?(path)
+          template = ::Tilt.new path, 1, outvar: '@_output'
+        else
+          VIEW_TYPES.each do |type|
+            f = "#{path}.#{type}"
 
-          if File.file? f
-            template = ::Tilt.new f, 1, outvar: '@_output'
-            break
+            if File.file? f
+              template = ::Tilt.new f, 1, outvar: '@_output'
+              break
+            end
           end
         end
 
