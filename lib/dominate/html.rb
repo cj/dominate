@@ -57,9 +57,9 @@ module Dominate
     private
 
     # @private Used internally by #render to cache the
-    #          Tilt templates.
+    #          ::Tilt templates.
     def _cache
-      Thread.current[:_cache] ||= Tilt::Cache.new
+      Thread.current[:_cache] ||= ::Tilt::Cache.new
     end
 
     def _dom_cache
