@@ -66,7 +66,7 @@ module Dominate
     private
 
     def sha
-      Thread.current[:_sha] ||= `git rev-parse HEAD`.strip
+      Thread.current[:_sha] ||= (Dominate.config.sha || `git rev-parse HEAD`.strip)
     end
   end
 end
