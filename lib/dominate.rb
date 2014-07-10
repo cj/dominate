@@ -40,8 +40,11 @@ module Dominate
         js: {},
         css: {}
       }),
-      asset_url:  '/assets',
-      asset_path: './assets'
+      asset_url:        '/assets',
+      asset_path:       './assets',
+      asset_js_folder:  'js',
+      asset_css_folder: 'css',
+      assets_compiled:  false
     })
   end
 

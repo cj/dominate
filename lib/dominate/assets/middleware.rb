@@ -3,8 +3,6 @@ require 'rack/mime'
 module Dominate
   module Assets
     class Middleware
-      STATIC_TYPES = %w(html js css eot woff ttf svg)
-
       attr_reader :app, :env, :res
 
       def initialize(app)
@@ -58,10 +56,12 @@ module Dominate
       end
 
       def name
-        cleaned = path.gsub(/\.#{ext}$/, '')
-        cleaned = cleaned.gsub(/^#{Dominate.config.asset_url}\//, '')
-        cleaned = cleaned.gsub(/^#{type}\//, '')
-        cleaned
+        @name ||= begin
+          cleaned = path.gsub(/\.#{ext}$/, '')
+          cleaned = cleaned.gsub(/^#{Dominate.config.asset_url}\//, '')
+          cleaned = cleaned.gsub(/^#{type}\//, '')
+          cleaned
+        end
       end
 
       def ext
@@ -73,22 +73,31 @@ module Dominate
       end
 
       def render_assets
-        if name == 'all'
-          res.write render_all_files
-        else
-          res.write render_single_file
-        end
-
         case type
         when 'css', 'stylesheet', 'stylesheets'
-          content_type = 'text/css'
+          content_type = 'text/css; charset=utf-8'
         when 'js', 'javascript', 'javascripts'
-          content_type = 'text/javascript'
+          content_type = 'text/javascript; charset=utf-8'
         else
           content_type = Rack::Mime.mime_type ext
         end
 
-        res.headers["Content-Type"] = content_type
+        res.headers.merge!({
+          "Content-Type"              => content_type,
+          "Cache-Control"             => 'public, max-age=2592000, no-transform',
+          'Connection'                => 'keep-alive',
+          'Age'                       => '25637',
+          'Strict-Transport-Security' => 'max-age=31536000'
+        })
+
+        if name == "all-#{sha}"
+          @name = 'dominate-compiled'
+          res.write render_single_file
+        elsif name == 'all'
+          res.write render_all_files
+        else
+          res.write render_single_file
+        end
 
         res.finish
       end
@@ -99,7 +108,7 @@ module Dominate
         path    = "#{Dominate.config.asset_path}/#{type}"
 
         files.each do |file|
-          content += load_file "#{path}/#{file}"
+          content += Dominate::HTML.load_file "#{path}/#{file}"
         end
 
         content
@@ -107,17 +116,11 @@ module Dominate
 
       def render_single_file
         path  = "#{Dominate.config.asset_path}/#{type}"
-        load_file "#{path}/#{name}.#{ext}"
+        Dominate::HTML.load_file "#{path}/#{name}.#{ext}"
       end
 
-      def load_file path
-        ext = path[/\.[^.]*$/][1..-1]
-
-        if STATIC_TYPES.include? ext
-          File.read path
-        else
-          Dominate::HTML.load_file path
-        end
+      def sha
+        Thread.current[:_sha] ||= `git rev-parse HEAD`.strip
       end
     end
   end

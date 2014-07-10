@@ -1,8 +1,12 @@
+require 'tilt/template'
+
 module Dominate
   module HTML
     extend self
 
-    VIEW_TYPES = %w(html slim haml erb md markdown mkd mab)
+    STATIC_TYPES = %w(html js css eot woff ttf svg)
+    VIEW_TYPES   = %w(html slim haml erb md markdown mkd mab)
+
 
     def file file, instance = false, config = {}
       c    = (Dominate.config.to_h.merge config).to_deep_ostruct
@@ -27,11 +31,20 @@ module Dominate
     end
 
     def load_file path, c = {}, instance = self
+      c[:moo] = 'cow'
       html = _cache.fetch(path) {
         template = false
 
-        if path[/\..*$/] && File.file?(path)
-          template = Tilt.new path, 1, outvar: '@_output'
+        ext = path[/\.[^.]*$/][1..-1]
+
+        if ext && File.file?(path)
+          if STATIC_TYPES.include? ext
+            template = Tilt::PlainTemplate.new nil, 1, outvar: '@_output', default_encoding: 'UTF-8' do |t|
+              File.read(path)
+            end
+          else
+            template = Tilt.new path, 1, outvar: '@_output'
+          end
         else
           VIEW_TYPES.each do |type|
             f = "#{path}.#{type}"
