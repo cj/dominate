@@ -56,9 +56,9 @@ module Dominate
             content += Dominate::HTML.load_file path
           end
           tmp_path = "#{type_path}/tmp.dominate-compiled.#{type}"
-          File.write "#{type_path}/dominate-compiled.#{type}", content
-          # system "minify #{tmp_path} > #{type_path}/dominate-compiled.#{type}"
-          # File.delete tmp_path
+          File.write tmp_path, content
+          system "minify #{tmp_path} > #{type_path}/dominate-compiled.#{type}"
+          File.delete tmp_path
         end
       end
     end
