@@ -1,4 +1,5 @@
 require 'rack/mime'
+require 'open-uri'
 
 module Dominate
   module Assets
@@ -87,7 +88,8 @@ module Dominate
           "Cache-Control"             => 'public, max-age=2592000, no-transform',
           'Connection'                => 'keep-alive',
           'Age'                       => '25637',
-          'Strict-Transport-Security' => 'max-age=31536000'
+          'Strict-Transport-Security' => 'max-age=31536000',
+          'Content-Disposition'       => 'inline'
         })
 
         if name == "all-#{sha}"
@@ -108,7 +110,11 @@ module Dominate
         path    = "#{Dominate.config.asset_path}/#{type}"
 
         files.each do |file|
-          content += Dominate::HTML.load_file "#{path}/#{file}"
+          if file[/^http/]
+            content += open(file).string
+          else
+            content += Dominate::HTML.load_file("#{path}/#{file}")
+          end
         end
 
         content

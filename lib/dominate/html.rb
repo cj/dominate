@@ -4,7 +4,9 @@ module Dominate
   module HTML
     extend self
 
-    STATIC_TYPES = %w(html js css eot woff ttf svg)
+    IMAGE_TYPES  = %w(png gif jpg jpeg)
+    FONT_TYPES   = %w(eot woff ttf svg)
+    STATIC_TYPES = %w(html js css map)
     VIEW_TYPES   = %w(html slim haml erb md markdown mkd mab)
 
 
@@ -31,8 +33,7 @@ module Dominate
     end
 
     def load_file path, c = {}, instance = self
-      c[:moo] = 'cow'
-      html = _cache.fetch(path) {
+      cache = _cache.fetch(path) {
         template = false
 
         ext = path[/\.[^.]*$/][1..-1]
@@ -42,6 +43,8 @@ module Dominate
             template = Tilt::PlainTemplate.new nil, 1, outvar: '@_output', default_encoding: 'UTF-8' do |t|
               File.read(path)
             end
+          elsif FONT_TYPES.include?(ext) || IMAGE_TYPES.include?(ext)
+            template = File.read path
           else
             template = Tilt.new path, 1, outvar: '@_output'
           end
@@ -62,9 +65,13 @@ module Dominate
         end
 
         template
-      }.render instance, c.to_h
+      }
 
-      html
+      if defined? cache.render
+        cache.render instance, c.to_h
+      else
+        cache.to_s
+      end
     end
 
     private

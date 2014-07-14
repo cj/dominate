@@ -18,7 +18,7 @@ module Dominate
     def load_html
       load_layout if config.layout
 
-      inner_html = doc.inner_html
+      inner_html = doc.to_s
 
       updated_html = inner_html.gsub(PARTIAL_REGEX_WITHIN) do |m|
         match   = m.strip.match(PARTIAL_REGEX)
